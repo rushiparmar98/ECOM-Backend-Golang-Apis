@@ -4,19 +4,28 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // PostgreSQL driver
 )
 
 var DB *sql.DB
 
+// ConnectDatabase connects to the PostgreSQL database using the connection string
+// from the environment variable or a hardcoded local connection string.
 func ConnectDatabase() {
 
 	var err error
 
-	connStr := "user=postgres dbname=ecom_db password=jamesbond007 host=localhost port=5432 sslmode=disable"
+	// Get the database URL from the environment variable
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		// If DATABASE_URL is not set, use the hardcoded connection string (local development)
+		dbURL = "user=postgres dbname=ecom_db password=jamesbond007 host=localhost port=5432 sslmode=disable"
+	}
 
-	DB, err = sql.Open("postgres", connStr)
+	// Open a connection to the database
+	DB, err = sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatalf("Failed to connect to the database: %v", err)
 	}
